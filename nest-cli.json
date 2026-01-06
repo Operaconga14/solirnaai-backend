@@ -5,16 +5,5 @@
   "compilerOptions": {
     "deleteOutDir": true,
     "webpack": true
-  },
-  "projects": {
-    "regrex/email-regrex": {
-      "type": "library",
-      "root": "libs/regrex/email-regrex",
-      "entryFile": "index",
-      "sourceRoot": "libs/regrex/email-regrex/src",
-      "compilerOptions": {
-        "tsConfigPath": "libs/regrex/email-regrex/tsconfig.lib.json"
-      }
-    }
   }
 }

@@ -6,42 +6,40 @@ import {
 import { RegisterAuthDto } from './dto/register-auth.dto';
 import { LoginAuthDto } from './dto/login-auth.dto';
 import { PasswordService } from 'src/utils/password.service';
-
-interface User {
-  id: number;
-  email: string;
-  password: string;
-  name: string;
-}
-
-const mockDatabase: User[] = [];
+import { MockdatabaseService } from 'src/utils/mockdatabase.service';
 
 @Injectable()
 export class AuthService {
-  constructor(private readonly passwordService: PasswordService) {}
+  constructor(
+    private readonly passwordService: PasswordService,
+    private mockDatabaseService: MockdatabaseService,
+  ) {}
 
   async register(registerAuthDto: RegisterAuthDto) {
     try {
-      // TODO: check the user exist implement registration logic (e.g., save user to database, hash password, send verification email, etc.)
-      if (registerAuthDto.confirmPassword !== registerAuthDto.password) {
-        throw new BadRequestException('Passwords do not match');
-      }
+      const existingUser = this.mockDatabaseService.getuserByEmail(
+        registerAuthDto.email,
+      );
 
-      // Hash password before saving (pseudo-code)
+      if (existingUser) throw new BadRequestException('Email already in use');
+
+      if (registerAuthDto.confirmPassword !== registerAuthDto.password)
+        throw new BadRequestException('Passwords do not match');
+
       const hashedPassword = await this.passwordService.hashPassword(
         registerAuthDto.password,
       );
 
-      mockDatabase.push({
-        id: mockDatabase.length + 1,
+      const newUser = this.mockDatabaseService.addUser({
+        id: this.mockDatabaseService.getAllUsers().length + 1,
         email: registerAuthDto.email,
-        password: await hashedPassword,
+        password: hashedPassword,
         name: registerAuthDto.name,
       });
 
       return {
-        message: 'Registration successful. check your email for verification.',
-        user: mockDatabase,
+        message: 'Registration successful. Check your email for verification.',
+        user: newUser,
       };
     } catch (error) {
       throw new InternalServerErrorException(error);
@@ -49,6 +47,25 @@ export class AuthService {
   }
 
   async login(loginAuthDto: LoginAuthDto) {
-    return 'This action logs in a user';
+    try {
+      const user = this.mockDatabaseService.getuserByEmail(loginAuthDto.email);
+
+      if (!user) throw new BadRequestException('Invalid email or password');
+
+      const ispasswordMatched = await this.passwordService.comparePasswords(
+        loginAuthDto.password,
+        user.password,
+      );
+
+      if (!ispasswordMatched)
+        throw new BadRequestException('Invalid email or password');
+
+      return {
+        message: 'Login successful',
+        user: user,
+      };
+    } catch (error) {
+      throw new InternalServerErrorException(error);
+    }
   }
 }
