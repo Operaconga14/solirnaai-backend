@@ -20,6 +20,14 @@
     "forceConsistentCasingInFileNames": true,
     "noImplicitAny": false,
     "strictBindCallApply": false,
-    "noFallthroughCasesInSwitch": false
+    "noFallthroughCasesInSwitch": false,
+    "paths": {
+      "@app/regrex/email-regrex": [
+        "libs/regrex/email-regrex/src"
+      ],
+      "@app/regrex/email-regrex/*": [
+        "libs/regrex/email-regrex/src/*"
+      ]
+    }
   }
 }
