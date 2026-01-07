@@ -1,26 +1,25 @@
-import { Injectable } from '@nestjs/common';
-import { CreateUserDto } from './dto/create-user.dto';
-import { UpdateUserDto } from './dto/update-user.dto';
+import {
+  Injectable,
+  InternalServerErrorException,
+  NotFoundException,
+} from '@nestjs/common';
+import { MockdatabaseService } from 'src/utils/mockdatabase.service';
 
 @Injectable()
 export class UsersService {
-  create(createUserDto: CreateUserDto) {
-    return 'This action adds a new user';
-  }
+  constructor(private readonly mockdatabaseServeice: MockdatabaseService) {}
 
-  findAll() {
-    return `This action returns all users`;
-  }
+  async myDetails(req: any) {
+    try {
+      const userId = req.user.id;
 
-  findOne(id: number) {
-    return `This action returns a #${id} user`;
-  }
+      const user = await this.mockdatabaseServeice.getUserById(userId);
 
-  update(id: number, updateUserDto: UpdateUserDto) {
-    return `This action updates a #${id} user`;
-  }
+      if (!user) throw new NotFoundException('User not found');
 
-  remove(id: number) {
-    return `This action removes a #${id} user`;
+      return user;
+    } catch (error) {
+      throw new InternalServerErrorException(error);
+    }
   }
 }

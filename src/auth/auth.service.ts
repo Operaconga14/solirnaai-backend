@@ -7,12 +7,14 @@ import { RegisterAuthDto } from './dto/register-auth.dto';
 import { LoginAuthDto } from './dto/login-auth.dto';
 import { PasswordService } from 'src/utils/password.service';
 import { MockdatabaseService } from 'src/utils/mockdatabase.service';
+import { TokenutilsService } from 'src/utils/tokenutils.service';
 
 @Injectable()
 export class AuthService {
   constructor(
     private readonly passwordService: PasswordService,
     private mockDatabaseService: MockdatabaseService,
+    private tokenUtilsService: TokenutilsService,
   ) {}
 
   async register(registerAuthDto: RegisterAuthDto) {
@@ -60,9 +62,12 @@ export class AuthService {
       if (!ispasswordMatched)
         throw new BadRequestException('Invalid email or password');
 
+      const token = await this.tokenUtilsService.generateToken(user);
+
       return {
         message: 'Login successful',
         user: user,
+        token: token,
       };
     } catch (error) {
       throw new InternalServerErrorException(error);

@@ -18,6 +18,10 @@ export class MockdatabaseService {
     return this.mockDatabse.find((user) => user.email === email);
   }
 
+  getUserById(id: number): MocksUser | undefined {
+    return this.mockDatabse.find((user) => user.id === id);
+  }
+
   removeUserById(userId: number): void {
     this.mockDatabse = this.mockDatabse.filter((user) => user.id !== userId);
   }
